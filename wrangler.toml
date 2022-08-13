@@ -1,0 +1,5 @@
+account_id = "7c1a592e8268c3eac8bffc6e002255b4"
+name = "songs-of-the-internet"
+type = "webpack"
+workers_dev = true
+site = { bucket = "./public" }

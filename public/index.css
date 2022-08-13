@@ -1,0 +1,7 @@
+.fmain{display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%}
+.input{padding:10px;font-size:1.5em;border:solid white 2px;border-radius:5px;width:100%}
+.input:focus{outline:none}
+.error{padding-top:1em;display:flex}
+:root{--color-a: #5B3758;--color-b: #C65B7C;--color-c: #F9627D;--color-d: #F9ADA0;--color-e: #83B692}
+.dmain{display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;height:90%;max-width:400px}
+.spinner{display:none}
