@@ -87,8 +87,11 @@ async function loadNextSet(){
       console.log(`Looping ${agent}, ${n}`);
 
       const seq = new Tone.Sequence((time, note) => {
-        //console.log(`11 playing ${note}`);
-	synths[agent].triggerAttackRelease(Tone.Frequency(note, "midi").toFrequency(), 0.1, time);
+        let duration = "8n";
+        if (synths[agent].type == "nsynth") {
+          duration = "8n";
+        }
+	synths[agent].synth.triggerAttackRelease(Tone.Frequency(note, "midi").toFrequency(), duration, time);
       }, n).start(0);
     }
 
@@ -107,19 +110,31 @@ async function startSynth(agent) {
     numAgents = Object.keys(synths).length;
     switch (numAgents) {
     case 0:
-      synths[agent] = new Tone.Synth().toDestination();
+      synths[agent] = {
+        synth: new Tone.Synth().toDestination(),
+        type: "synth",
+      };
       console.log(`Starting synth for ${agent}`);
       return;
     case 1:
-      synths[agent] = new Tone.Synth().toDestination();
-      console.log(`Starting synth for ${agent}`);
+      synths[agent] = {
+        synth: new Tone.Synth().toDestination(),
+        type: "nsynth",
+      };
+      console.log(`Starting noise synth for ${agent}`);
       return;
     case 2:
-      synths[agent] = new Tone.FMSynth().toDestination();
+      synths[agent] = {
+        synth: new Tone.FMSynth().toDestination(),
+        type: "fmsynth",
+      };
       console.log(`Starting fmsynth for ${agent}`);
       return;
     default:
-      synths[agent] = new Tone.Synth().toDestination();
+      synths[agent] = {
+        synth: new Tone.Synth().toDestination(),
+        type: "synth",
+      };
       console.log(`Starting synth for ${agent}`);
       return;
     }
