@@ -37,51 +37,38 @@ async function loadNextSet(){
       return;
     }
 
-    for (const [agent, _] of Object.entries(output.agents)) {
-      startSynth(agent);
-    };
-
+    setSpin('none');
     const notes = {};
     const lastNotes = {};
-    output.events.forEach(event => {
-      setSpin('none');
-      for (const [agent, value] of Object.entries(event)) {
-        if (agent != "timestamp") {
-          if (value.event == "error") {
-            setError(value.cause);
-            continue;
-          }
 
-          if (!(agent in notes)) {
-            notes[agent] = [];
+    for (const event of output) {
+      startSynth(event.location);
+      if (!(event.location in notes)) {
+        notes[event.location] = [];
+      }
+      if (!(event.location in lastNotes)) {
+        lastNotes[event.location] = {};
+      }
+      midi = (event.avg_rtt + 50) % 128;
+      if (lastNotes[event.location].note) {
+        delta = Math.abs(lastNotes[event.location].note - midi);
+        if (delta > 10) {
+          if (lastNotes[event.location].set == null) {
+            lastNotes[event.location].set = [midi];
+          } else {
+            notes[event.location] = notes[event.location].concat([lastNotes[event.location].set]);
+            lastNotes[event.location].set = null;
           }
-          if (!(agent in lastNotes)) {
-            lastNotes[agent] = {};
+        } else {
+          if (lastNotes[event.location].set == null) {
+            lastNotes[event.location].set = [];
           }
-          midi = (value.rtt + 50) % 128;
-          if (lastNotes[agent].note) {
-            delta = Math.abs(lastNotes[agent].note - midi);
-            if (delta > 10) {
-              if (lastNotes[agent].set == null) {
-                lastNotes[agent].set = [midi];
-              } else {
-                notes[agent] = notes[agent].concat([lastNotes[agent].set]);
-                //console.log(`Adding ${lastNotes[agent].set}`);
-                lastNotes[agent].set = null;
-              }
-            } else {
-              if (lastNotes[agent].set == null) {
-                lastNotes[agent].set = [];
-              }
-              lastNotes[agent].set.push(midi);
-            }
-          }
-          lastNotes[agent].note = midi;
-          notes[agent].push(midi);
+          lastNotes[event.location].set.push(midi);
         }
       }
-    });
-
+      lastNotes[event.location].note = midi;
+      notes[event.location].push(midi);
+    }
 
     for (const [agent, n] of Object.entries(notes)) {
       console.log(`Looping ${agent}, ${n}`);
@@ -250,4 +237,13 @@ function handleUserActivation (e) {
     htmlAudioState = 'pending'
     unMute();
   }
+}
+
+const chords = {
+  notes: [
+    [55, 71, 74, 79], //  G, B, D, G
+    [62, 69, 74, 78], // D
+    [64, 71 ,76, 79], // E
+    [48, 60, 64, 67] // C
+  ]
 }
