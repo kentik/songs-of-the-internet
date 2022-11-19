@@ -32,8 +32,7 @@ async function loadNextSet(){
   const data = getLatency();
   if (data instanceof Promise){
     const output = await data
-    if (!output) {
-      playing = false;
+    if (!output || output.length == 0) {
       return;
     }
 
@@ -49,7 +48,7 @@ async function loadNextSet(){
       if (!(event.location in lastNotes)) {
         lastNotes[event.location] = {};
       }
-      midi = (event.avg_rtt + 50) % 128;
+      midi = (event.avg_rtt + 50) % 100; // Top notes are too squeeky
       if (lastNotes[event.location].note) {
         delta = Math.abs(lastNotes[event.location].note - midi);
         if (delta > 10) {
@@ -106,14 +105,14 @@ async function startSynth(agent) {
     case 1:
       synths[agent] = {
         synth: new Tone.Synth().toDestination(),
-        type: "nsynth",
+        type: "synth", // n
       };
       console.log(`Starting noise synth for ${agent}`);
       return;
     case 2:
       synths[agent] = {
         synth: new Tone.FMSynth().toDestination(),
-        type: "fmsynth",
+        type: "synth", // fm
       };
       console.log(`Starting fmsynth for ${agent}`);
       return;
